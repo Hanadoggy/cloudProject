@@ -1,14 +1,14 @@
 package dbwls.cloudProject.member.controller;
 
+import dbwls.cloudProject.member.dto.MemberDto;
 import dbwls.cloudProject.member.dto.MemberPostDto;
+import dbwls.cloudProject.member.dto.MyPageDto;
 import dbwls.cloudProject.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,9 +16,27 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberApiController {
     private final MemberService memberService;
 
-    @GetMapping("/sign-up")
-    public ResponseEntity<?> signUp(@Valid @RequestBody MemberPostDto memberPostDto) {
-        return memberService.createMemberAccountAndSave(memberPostDto.toEntity());
-        // TODO: 포스트맨으로 테스트해보기, 테스트 코드로 테스트하는 방법 구상해보기
+    @PostMapping("/sign-up")
+    public ResponseEntity<Void> signUp(@Valid @RequestBody MemberPostDto memberPostDto) {
+        return memberService.createMemberAccountAndSave(memberPostDto);
+    }
+
+    @GetMapping("/{nickname}")
+    public ResponseEntity<MemberDto> getMemberInfo(@PathVariable String nickname) {
+        return memberService.getMemberInformation(nickname);
+    }
+
+    @PostMapping("/{nickname}")
+    public ResponseEntity<Void> checkDuplicatedNickname(@PathVariable String nickname) {
+        return memberService.checkNicknameIsDuplicated(nickname);
+    }
+
+    @GetMapping("/my-page")
+    public ResponseEntity<MyPageDto> getMyPageInfo() {
+        return memberService.getMyPageInfo(getLoggedInNickname());
+    }
+
+    private String getLoggedInNickname() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }

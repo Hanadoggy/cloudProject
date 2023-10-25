@@ -8,18 +8,16 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class ErrorResponseObject {
+public class ErrorResponse {
     private LocalDateTime time;
-    private String errorStatus;
-    private String detailMessage;
+    private String errorMessage;
 
-    public static ResponseEntity<ErrorResponseObject> createERO(ErrorCode errorCode) {
+    public static ResponseEntity<ErrorResponse> createWith(ErrorCode errorCode) {
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
-                .body(ErrorResponseObject.builder()
+                .body(ErrorResponse.builder()
                         .time(LocalDateTime.now())
-                        .errorStatus(errorCode.getHttpStatus().toString())
-                        .detailMessage(errorCode.getDetailMessage())
+                        .errorMessage(errorCode.getErrorMessage())
                         .build());
     }
 }

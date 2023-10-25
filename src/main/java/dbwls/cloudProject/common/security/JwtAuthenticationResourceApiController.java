@@ -4,8 +4,8 @@ import dbwls.cloudProject.common.entity.JwtResponse;
 import dbwls.cloudProject.common.entity.TestObject;
 import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -22,12 +22,13 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 public class JwtAuthenticationResourceApiController {
-
     private final JwtEncoder jwtEncoder;
 
     @GetMapping("/test-api/{username}")
-    @PreAuthorize("hasRole('USER') and #username == authentication.name")
+//    @PreAuthorize("hasRole('USER') and #username == authentication.name")
     @PostAuthorize("returnObject.message == 'success!!yujin'")
+//    @RolesAllowed({"ADMIN", "USER"})
+    @Secured({"ROLE_ADMIN", "ROLE_USER"})
     public TestObject testApiCall(@PathVariable String username) {
         return new TestObject("success!!" + username);
     }

@@ -17,21 +17,25 @@ public class Member extends BaseTimeEntity {
     @Id @GeneratedValue
     @Column(name = "member_id")
     private Long id;
-    private String name;
+    private String nickname;
     private String phoneNumber;
     private String password;
 
-    public void changeName(String name) {
-        this.name = name;
+    public void changeNickName(String nickname) {
+        this.nickname = nickname;
     }
 
     public void changePassword(String password) {
         this.password = password;
     }
 
+    public void changePhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     @Builder
-    public Member(String name, String phoneNumber, String password) {
-        this.name = name;
+    public Member(String nickname, String phoneNumber, String password) {
+        this.nickname = nickname;
         this.phoneNumber = phoneNumber;
         this.password = password;
     }
