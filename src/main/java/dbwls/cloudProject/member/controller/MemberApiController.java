@@ -7,6 +7,7 @@ import dbwls.cloudProject.member.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ public class MemberApiController {
     private final MemberService memberService;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<Void> signUp(@Valid @RequestBody MemberPostDto memberPostDto) {
+    public ResponseEntity<Void> signUp(@RequestBody @Valid MemberPostDto memberPostDto) {
         return memberService.createMemberAccountAndSave(memberPostDto);
     }
 
@@ -31,6 +32,7 @@ public class MemberApiController {
         return memberService.checkNicknameIsDuplicated(nickname);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/my-page")
     public ResponseEntity<MyPageDto> getMyPageInfo() {
         return memberService.getMyPageInfo(getLoggedInNickname());

@@ -1,37 +1,25 @@
 package dbwls.cloudProject.common.security;
 
 import dbwls.cloudProject.common.entity.JwtResponse;
-import dbwls.cloudProject.common.entity.TestObject;
 import jakarta.annotation.security.PermitAll;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PostAuthorize;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class JwtAuthenticationResourceApiController {
     private final JwtEncoder jwtEncoder;
-
-    @GetMapping("/test-api/{username}")
-//    @PreAuthorize("hasRole('USER') and #username == authentication.name")
-    @PostAuthorize("returnObject.message == 'success!!yujin'")
-//    @RolesAllowed({"ADMIN", "USER"})
-    @Secured({"ROLE_ADMIN", "ROLE_USER"})
-    public TestObject testApiCall(@PathVariable String username) {
-        return new TestObject("success!!" + username);
-    }
 
     @PostMapping("/authenticate")
     @PermitAll
@@ -47,7 +35,7 @@ public class JwtAuthenticationResourceApiController {
         return JwtEncoderParameters.from(JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plusSeconds(30*60))
+                .expiresAt(Instant.now().plusSeconds(1800))
                 .subject(authentication.getName())
                 .claim("scope", createClaim(authentication))
                 .build()

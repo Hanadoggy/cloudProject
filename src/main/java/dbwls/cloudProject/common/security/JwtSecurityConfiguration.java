@@ -22,6 +22,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -35,14 +37,6 @@ import java.util.UUID;
 @Configuration
 @EnableMethodSecurity(jsr250Enabled = true)
 public class JwtSecurityConfiguration {
-
-    /**
-     *  1. 모든 요청은 인증되어야 함
-     *  2. csrf 비활성화 (쿠키와 세션을 사용하지 않을 때)
-     *  3. 세션 비활성화 (STATELESS 설정)
-     *  4. oauth2ResourceServer 설정
-     *  5. 자격증명이 없거나 인증되지 않았다면 팝업으로 인증 여부를 물어봄
-     */
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(auth -> {
@@ -60,7 +54,6 @@ public class JwtSecurityConfiguration {
     }
 
     // 임시 유저 데이터 ~~
-
     @Bean
     public DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
@@ -68,7 +61,6 @@ public class JwtSecurityConfiguration {
                 .addScript(JdbcDaoImpl.DEFAULT_USER_SCHEMA_DDL_LOCATION)
                 .build();
     }
-
     @Bean
     public UserDetailsService userDetailService(DataSource dataSource) {
 
@@ -92,8 +84,20 @@ public class JwtSecurityConfiguration {
 
         return jdbcUserDetailsManager;
     }
-
     // ~~ 임시 유저 데이터
+
+    /**
+     * jwt 생성시에는 제대로 권한이 생성됨, ROLE_USER
+     * 전달받은 jwt를 읽어서 role을 읽을 때 붙는 SCOPE_ 제거, SCOPE_ROLE_USER
+     */
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        grantedAuthoritiesConverter.setAuthorityPrefix("");
+        JwtAuthenticationConverter authConverter = new JwtAuthenticationConverter();
+        authConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        return authConverter;
+    }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
