@@ -19,6 +19,9 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     public ResponseEntity<Void> createMemberAccountAndSave(MemberPostDto memberPostDto) {
+        if (memberRepository.findByNickname(memberPostDto.getNickname()).isPresent()) {
+            throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
+        }
         memberRepository.save(memberPostDto.toEntityWithEncoder(passwordEncoder));
         return ResponseEntity.noContent().build();
     }

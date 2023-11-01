@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class MemberPostDto {
     @NotBlank
     private String nickname;
-    @NotBlank
+    @Size(min = 11, max = 11)
     private String phone;
     @Size(min = 8, max = 32)
     private String password;
